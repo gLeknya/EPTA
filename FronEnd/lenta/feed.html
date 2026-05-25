@@ -18,10 +18,18 @@
         </div>
         <div class="menu-panel" id="menuPanel">
             <div class="menu-content">
-                <a href="feed.html" class="menu-item active">📰 Лента</a>
-                <a href="../you/index.html" class="menu-item">👤 Профиль</a>
-                <a href="#" class="menu-item">⚙️ Настройки</a>
-                <a href="#" class="menu-item">💬 Чаты</a>
+                <a href="feed.html" class="menu-item active">
+                    <img src="../png/grid.png" class="icon-20" alt=""> Лента
+                </a>
+                <a href="../you/index.html" class="menu-item">
+                    <img src="../png/portrait.png" class="icon-20" alt=""> Профиль
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../png/sun.png" class="icon-20" alt=""> Настройки
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../png/comment.png" class="icon-20" alt=""> Чаты
+                </a>
             </div>
         </div>
     </div>
@@ -39,9 +47,9 @@
         <div class="feed-grid">
             <div class="feed-main">
                 <div class="feed-tabs">
-                    <button class="feed-tab active" onclick="switchFeedTab(this, 'recommendations')">🔥 Рекомендации</button>
-                    <button class="feed-tab" onclick="switchFeedTab(this, 'popular')">⭐ Популярное</button>
-                    <button class="feed-tab" onclick="switchFeedTab(this, 'fresh')">🆕 Свежее</button>
+                    <button class="feed-tab active" onclick="switchFeedTab(this, 'recommendations')">Рекомендации</button>
+                    <button class="feed-tab" onclick="switchFeedTab(this, 'popular')">Популярное</button>
+                    <button class="feed-tab" onclick="switchFeedTab(this, 'fresh')">Свежее</button>
                 </div>
 
                 <div class="filters-bar" id="filtersBar">
@@ -54,83 +62,53 @@
                 </div>
 
                 <div class="feed-content" id="feedContent">
-                    <div class="post-editor">
-                        <div class="post-avatar-placeholder">😊</div>
-                        <div class="post-input-wrapper">
-                            <textarea class="post-input" placeholder="Поделись чем-то с миром..." id="feedPostInput"></textarea>
-                            <div class="post-actions-bar">
-                                <input type="file" id="feedFileInput" style="display: none;" multiple accept="image/*,video/*" onchange="handleFeedFiles(this.files)">
-                                <button class="post-action-icon glass-btn" title="Прикрепить файл" onclick="document.getElementById('feedFileInput').click()">📎</button>
-                                <div class="file-list" id="feedFileList"></div>
-                                <button class="post-submit glass-btn" onclick="addFeedPost()">✈️</button>
-                            </div>
-                        </div>
-                    </div>
                     <div id="feedPosts"></div>
                 </div>
             </div>
 
             <aside class="feed-sidebar">
                 <div class="sidebar-card">
-                    <div class="sidebar-title">🔥 Популярные хештеги</div>
-                    <div class="hashtags-cloud">
-                        <a href="#" class="hashtag">#ЕПТА</a>
-                        <a href="#" class="hashtag">#toxicGreen</a>
-                        <a href="#" class="hashtag">#кодинг</a>
-                        <a href="#" class="hashtag">#музыка</a>
-                        <a href="#" class="hashtag">#дизайн</a>
-                        <a href="#" class="hashtag">#технологии</a>
-                        <a href="#" class="hashtag">#гейминг</a>
-                        <a href="#" class="hashtag">#спорт</a>
-                        <a href="#" class="hashtag">#кино</a>
-                        <a href="#" class="hashtag">#юмор</a>
-                        <a href="#" class="hashtag">#42</a>
-                        <a href="#" class="hashtag">#разработка</a>
-                    </div>
+                    <div class="sidebar-title">Топ хештеги</div>
+                    <div class="hashtags-cloud" id="topHashtags"></div>
                 </div>
-
                 <div class="sidebar-card">
-                    <div class="sidebar-title">⭐ Популярные посты</div>
-                    <div class="popular-posts">
-                        <div class="popular-post-item">
-                            <div class="popular-post-rank">#1</div>
-                            <div class="popular-post-info">
-                                <div class="popular-post-text">Топовые фичи нового обновления!</div>
-                                <div class="popular-post-stats">❤️ 1.2K | 💬 342 | 🔄 89</div>
-                            </div>
-                        </div>
-                        <div class="popular-post-item">
-                            <div class="popular-post-rank">#2</div>
-                            <div class="popular-post-info">
-                                <div class="popular-post-text">Как я создал свой первый проект за 24 часа</div>
-                                <div class="popular-post-stats">❤️ 987 | 💬 234 | 🔄 56</div>
-                            </div>
-                        </div>
-                        <div class="popular-post-item">
-                            <div class="popular-post-rank">#3</div>
-                            <div class="popular-post-info">
-                                <div class="popular-post-text">Лучшие практики 2024 года</div>
-                                <div class="popular-post-stats">❤️ 756 | 💬 189 | 🔄 34</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="in-development">🚧 В разработке</div>
+                    <div class="sidebar-title">Топ посты</div>
+                    <div class="popular-posts" id="topPosts"></div>
                 </div>
             </aside>
         </div>
     </div>
 
-    <!-- Модалка комментариев -->
     <div class="modal-overlay" id="feedCommentsModal">
         <div class="modal" style="max-width: 500px;">
-            <div class="modal-title">Комментарии</div>
+            <div class="modal-title">
+                <img src="../png/comment.png" class="icon-20" alt=""> Комментарии
+            </div>
             <div class="comments-list" id="feedCommentsList"></div>
             <div class="comment-input-wrapper">
                 <input type="text" class="modal-input" id="feedCommentInput" placeholder="Написать комментарий...">
-                <button class="btn btn-primary glass-btn" onclick="addFeedComment()">Отправить</button>
+                <button class="btn btn-primary glass-btn" onclick="addFeedComment()">
+                    <img src="../png/paper-plane.png" class="icon-16" alt=""> Отправить
+                </button>
             </div>
-            <div class="modal-actions" style="margin-top: 10px;">
-                <button class="btn btn-secondary glass-btn" onclick="closeFeedComments()">Закрыть</button>
+            <div class="modal-actions" style="margin-top:10px;">
+                <button class="btn btn-secondary glass-btn" onclick="closeFeedComments()">
+                    <img src="../png/cross.png" class="icon-16" alt=""> Закрыть
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="repostModal">
+        <div class="modal" style="max-width:400px;">
+            <div class="modal-title">
+                <img src="../png/users-alt.png" class="icon-20" alt=""> Поделиться с
+            </div>
+            <div class="repost-contacts" id="repostContacts"></div>
+            <div class="modal-actions" style="margin-top:10px;">
+                <button class="btn btn-secondary glass-btn" onclick="closeRepostModal()">
+                    <img src="../png/cross.png" class="icon-16" alt=""> Отмена
+                </button>
             </div>
         </div>
     </div>

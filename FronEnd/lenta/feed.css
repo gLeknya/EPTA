@@ -1,4 +1,9 @@
-/* Стили для ленты */
+/* Иконки */
+.icon-16 { width: 16px; height: 16px; object-fit: contain; }
+.icon-18 { width: 18px; height: 18px; object-fit: contain; }
+.icon-20 { width: 20px; height: 20px; object-fit: contain; }
+.icon-24 { width: 24px; height: 24px; object-fit: contain; }
+
 .feed-container {
     max-width: 1000px;
     margin: 20px auto;
@@ -13,10 +18,7 @@
     gap: 20px;
 }
 
-/* Основной контент ленты */
-.feed-main {
-    min-width: 0;
-}
+.feed-main { min-width: 0; }
 
 .feed-tabs {
     display: flex;
@@ -40,10 +42,7 @@
     transition: all 0.3s;
 }
 
-.feed-tab:hover {
-    background: rgba(97, 222, 42, 0.05);
-    color: #61DE2A;
-}
+.feed-tab:hover { background: rgba(97, 222, 42, 0.05); color: #61DE2A; }
 
 .feed-tab.active {
     color: #61DE2A;
@@ -96,23 +95,15 @@
     flex-shrink: 0;
 }
 
-.feed-post-info {
-    flex: 1;
-}
+.feed-post-info { flex: 1; }
 
 .feed-post-author {
     font-weight: 700;
     font-size: 15px;
     color: #e0e0e0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
-.feed-post-date {
-    color: #666666;
-    font-size: 13px;
-}
+.feed-post-date { color: #666666; font-size: 13px; }
 
 .feed-post-tags {
     display: flex;
@@ -130,9 +121,7 @@
     border-radius: 10px;
 }
 
-.feed-post-tag:hover {
-    background: rgba(97, 222, 42, 0.2);
-}
+.feed-post-tag:hover { background: rgba(97, 222, 42, 0.2); }
 
 .feed-post-text {
     font-size: 15px;
@@ -140,15 +129,6 @@
     margin-bottom: 15px;
     color: #cccccc;
     word-break: break-word;
-}
-
-.feed-post-image {
-    width: 100%;
-    max-height: 300px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #333;
 }
 
 .feed-post-stats {
@@ -166,14 +146,13 @@
     flex-wrap: wrap;
 }
 
-/* Сайдбар ленты */
+/* Сайдбар */
 .feed-sidebar {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-/* Облако хештегов */
 .hashtags-cloud {
     display: flex;
     flex-wrap: wrap;
@@ -197,7 +176,6 @@
     box-shadow: 0 0 15px rgba(97, 222, 42, 0.2);
 }
 
-/* Популярные посты */
 .popular-posts {
     display: flex;
     flex-direction: column;
@@ -228,9 +206,7 @@
     text-align: center;
 }
 
-.popular-post-info {
-    flex: 1;
-}
+.popular-post-info { flex: 1; }
 
 .popular-post-text {
     font-size: 14px;
@@ -238,12 +214,8 @@
     margin-bottom: 5px;
 }
 
-.popular-post-stats {
-    font-size: 11px;
-    color: #666;
-}
+.popular-post-stats { font-size: 11px; color: #666; }
 
-/* В разработке */
 .in-development {
     text-align: center;
     padding: 15px;
@@ -255,29 +227,36 @@
     font-size: 14px;
 }
 
-/* Активный пункт меню */
 .menu-item.active {
     background: rgba(97, 222, 42, 0.15);
     color: #61DE2A;
-    border-left: 3px solid #61DE2A;
 }
 
-/* Адаптив */
+/* Репост контакты */
+.repost-contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.repost-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #e0e0e0;
+}
+
+.repost-contact-item:hover {
+    background: rgba(97, 222, 42, 0.1);
+}
+
 @media (max-width: 768px) {
-    .feed-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .feed-sidebar {
-        order: 2;
-    }
-    
-    .feed-post {
-        padding: 15px;
-    }
-    
-    .feed-tab {
-        padding: 12px;
-        font-size: 13px;
-    }
+    .feed-grid { grid-template-columns: 1fr; }
+    .feed-sidebar { order: 2; }
+    .feed-post { padding: 15px; }
+    .feed-tab { padding: 12px; font-size: 13px; }
 }

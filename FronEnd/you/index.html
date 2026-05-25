@@ -17,10 +17,18 @@
         </div>
         <div class="menu-panel" id="menuPanel">
             <div class="menu-content">
-                <a href="../lenta/feed.html" class="menu-item">📰 Лента</a>
-                <a href="#" class="menu-item">👤 Профиль</a>
-                <a href="#" class="menu-item">⚙️ Настройки</a>
-                <a href="#" class="menu-item">💬 Чаты</a>
+                <a href="../lenta/feed.html" class="menu-item">
+                    <img src="../png/grid.png" class="icon-20" alt=""> Лента
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../png/portrait.png" class="icon-20" alt=""> Профиль
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../png/sun.png" class="icon-20" alt=""> Настройки
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../png/comment.png" class="icon-20" alt=""> Чаты
+                </a>
             </div>
         </div>
     </div>
@@ -39,7 +47,9 @@
             <div class="profile-main">
                 <div class="avatar-section">
                     <div class="avatar-wrapper" id="avatarWrapper">
-                        <div class="avatar-placeholder" id="userAvatar">😊</div>
+                        <div class="avatar-placeholder">
+                            <img src="../png/portrait.png" class="avatar-img" alt="">
+                        </div>
                         <div class="status-selector-wrapper">
                             <div class="status-selector" id="statusSelector">
                                 <div class="status-dot" id="statusDot" onclick="toggleStatusDropdown(event)"></div>
@@ -70,7 +80,7 @@
                         <span id="profileName">@username</span>
                     </div>
                     <div class="profile-status" id="profileStatus" onclick="editStatus()">
-                        Добавить статус!
+                        Добавить статус
                     </div>
                     <div class="profile-details">
                         <div class="detail-item">
@@ -92,7 +102,7 @@
                     </div>
                     <div class="profile-actions">
                         <button class="btn btn-primary glass-btn" id="addFriendBtn" onclick="toggleFriend()">
-                            <span>👥</span> Добавить в друзья
+                            <img src="../png/users-alt.png" class="icon-18" alt=""> Добавить в друзья
                         </button>
                     </div>
                 </div>
@@ -103,7 +113,9 @@
             <div class="main-content">
                 <div class="profile-tabs">
                     <button class="tab-btn active" onclick="switchTab(this, 'wall')">Стена</button>
-                    <button class="tab-btn" onclick="switchTab(this, 'photos')">Фотки</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'photos')">
+                        <img src="../png/picture.png" class="icon-16" alt=""> Фотки
+                    </button>
                     <button class="tab-btn" onclick="switchTab(this, 'videos')">Видео</button>
                 </div>
                 
@@ -118,14 +130,23 @@
 
                 <div class="wall" id="wallContent">
                     <div class="post-editor">
-                        <div class="post-avatar-placeholder" id="editorAvatar">😊</div>
+                        <div class="post-avatar-placeholder">
+                            <img src="../png/portrait.png" class="avatar-img-small" alt="">
+                        </div>
                         <div class="post-input-wrapper">
-                            <textarea class="post-input" placeholder="Че нового, братан?" id="postInput"></textarea>
+                            <textarea class="post-input" placeholder="Что нового?" id="postInput"></textarea>
                             <div class="post-actions-bar">
-                                <input type="file" id="fileInput" style="display: none;" multiple accept="image/*,video/*" onchange="handleFiles(this.files)">
-                                <button class="post-action-icon glass-btn" title="Прикрепить файл" onclick="document.getElementById('fileInput').click()">📎</button>
+                                <input type="file" id="fileInput" style="display:none" multiple onchange="handleFiles(this.files)">
+                                <button class="post-action-icon glass-btn" onclick="document.getElementById('fileInput').click()">
+                                    <img src="../png/picture.png" class="icon-20" alt="">
+                                </button>
                                 <div class="file-list" id="fileList"></div>
-                                <button class="post-submit glass-btn" onclick="addPost()">✈️</button>
+                                <label style="color:#61DE2A;font-size:12px;display:flex;align-items:center;gap:5px;margin-left:10px">
+                                    <input type="checkbox" id="publicCheckbox"> Публичный
+                                </label>
+                                <button class="post-submit glass-btn" onclick="addPost()">
+                                    <img src="../png/paper-plane.png" class="icon-18" alt="">
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -157,29 +178,35 @@
         </div>
     </div>
 
-    <!-- Модалка статуса -->
     <div class="modal-overlay" id="statusModal">
         <div class="modal">
             <div class="modal-title">Изменить статус</div>
-            <input type="text" class="modal-input" id="statusInput" placeholder="Че по чем?">
+            <input type="text" class="modal-input" id="statusInput" placeholder="Введи статус">
             <div class="modal-actions">
-                <button class="btn btn-secondary glass-btn" onclick="closeStatusModal()">Отмена</button>
+                <button class="btn btn-secondary glass-btn" onclick="closeStatusModal()">
+                    <img src="../png/cross.png" class="icon-16" alt=""> Отмена
+                </button>
                 <button class="btn btn-primary glass-btn" onclick="saveStatus()">Сохранить</button>
             </div>
         </div>
     </div>
 
-    <!-- Модалка комментариев -->
     <div class="modal-overlay" id="commentsModal">
         <div class="modal" style="max-width: 500px;">
-            <div class="modal-title">Комментарии</div>
+            <div class="modal-title">
+                <img src="../png/comment.png" class="icon-20" alt=""> Комментарии
+            </div>
             <div class="comments-list" id="commentsList"></div>
             <div class="comment-input-wrapper">
                 <input type="text" class="modal-input" id="commentInput" placeholder="Написать комментарий...">
-                <button class="btn btn-primary glass-btn" id="addCommentBtn" onclick="addCommentToPost()">Отправить</button>
+                <button class="btn btn-primary glass-btn" onclick="addCommentToPost()">
+                    <img src="../png/paper-plane.png" class="icon-16" alt=""> Отправить
+                </button>
             </div>
             <div class="modal-actions" style="margin-top: 10px;">
-                <button class="btn btn-secondary glass-btn" onclick="closeCommentsModal()">Закрыть</button>
+                <button class="btn btn-secondary glass-btn" onclick="closeCommentsModal()">
+                    <img src="../png/cross.png" class="icon-16" alt=""> Закрыть
+                </button>
             </div>
         </div>
     </div>

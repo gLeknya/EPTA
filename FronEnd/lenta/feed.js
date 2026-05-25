@@ -1,319 +1,310 @@
-// Данные ленты
-let feedPosts = [];
+// Публичные посты из хранилища
+let publicPosts = JSON.parse(localStorage.getItem('epta_public_posts') || '[]');
+publicPosts = publicPosts.map(p => ({...p, date: new Date(p.date), files: p.files || []}));
+
 let currentFeedFilter = 'date';
 let currentFeedTab = 'recommendations';
+let currentFeedPostId = null;
 
-// Инициализация
+// Заглушка контактов (потом из чатов)
+let recentContacts = [
+    {name: '@alex', avatar: ':)'},
+    {name: '@maria', avatar: ':)'},
+    {name: '@dmitry', avatar: ':)'}
+];
+
 document.addEventListener('DOMContentLoaded', function() {
     createFallingNumbers();
-    generateFeedPosts();
+    refreshPublicPosts();
     renderFeed();
+    updateSidebar();
 });
 
-// Создание падающих чисел
+// Обновление публичных постов из хранилища
+function refreshPublicPosts() {
+    publicPosts = JSON.parse(localStorage.getItem('epta_public_posts') || '[]');
+    publicPosts = publicPosts.map(p => ({...p, date: new Date(p.date), files: p.files || []}));
+}
+
 function createFallingNumbers() {
     const container = document.getElementById('fallingNumbers');
     if (!container) return;
-    
     setInterval(() => {
         const number = document.createElement('div');
         number.className = 'falling-number';
         number.textContent = '42';
-        
-        const left = Math.random() * 100;
-        const duration = Math.random() * 10 + 8;
-        const size = Math.random() * 10 + 12;
-        
-        number.style.left = left + '%';
-        number.style.animationDuration = duration + 's';
-        number.style.fontSize = size + 'px';
-        
+        number.style.left = Math.random() * 100 + '%';
+        number.style.animationDuration = (Math.random() * 10 + 8) + 's';
+        number.style.fontSize = (Math.random() * 10 + 12) + 'px';
         container.appendChild(number);
-        
-        setTimeout(() => {
-            number.remove();
-        }, duration * 1000);
+        setTimeout(() => number.remove(), 18000);
     }, 800);
 }
 
-// Генерация тестовых постов для ленты
-function generateFeedPosts() {
-    const users = [
-        { name: '@alex_coder', avatar: '💻' },
-        { name: '@design_master', avatar: '🎨' },
-        { name: '@music_soul', avatar: '🎵' },
-        { name: '@gamer_pro', avatar: '🎮' },
-        { name: '@tech_guru', avatar: '⚡' },
-        { name: '@creative_mind', avatar: '✨' }
-    ];
-    
-    const tags = ['#ЕПТА', '#toxicGreen', '#кодинг', '#дизайн', '#технологии', '#42'];
-    
-    const posts = [
-        {
-            text: 'Только что закончил новый проект на React! Использовал Toxic Green цветовую схему 🔥 #ЕПТА #кодинг',
-            likes: 234,
-            views: 1200,
-            reposts: 45,
-            comments: 23
-        },
-        {
-            text: 'Дизайн интерфейса в стиле glassmorphism - это просто огонь! Делюсь наработками 🎨 #дизайн #toxicGreen',
-            likes: 567,
-            views: 3400,
-            reposts: 89,
-            comments: 56
-        },
-        {
-            text: 'Новый трек в стиле synthwave уже на подходе! Кто ждет? 🎵 #музыка #ЕПТА',
-            likes: 892,
-            views: 5600,
-            reposts: 134,
-            comments: 78
-        },
-        {
-            text: '42 - ответ на все вопросы! Кто понял, тот понял 😎 #42 #технологии',
-            likes: 1456,
-            views: 8900,
-            reposts: 267,
-            comments: 156
-        },
-        {
-            text: 'Разработка игры на JavaScript: делюсь опытом создания браузерной RPG 🎮 #кодинг #гейминг',
-            likes: 345,
-            views: 2100,
-            reposts: 56,
-            comments: 34
-        },
-        {
-            text: 'Топ 5 инструментов для веб-разработчика в 2024 году! Сохраняйте себе 📌 #технологии #ЕПТА',
-            likes: 678,
-            views: 4500,
-            reposts: 123,
-            comments: 67
-        },
-        {
-            text: 'Создаю уникальный UI kit в стиле Toxic Green. Будет доступен для скачивания! 🎨 #дизайн #toxicGreen',
-            likes: 456,
-            views: 2800,
-            reposts: 78,
-            comments: 45
-        },
-        {
-            text: 'Программирование - это искусство! Каждая строка кода как мазок кисти 💻✨ #кодинг #42',
-            likes: 789,
-            views: 5100,
-            reposts: 145,
-            comments: 89
-        }
-    ];
-    
-    posts.forEach((post, index) => {
-        const user = users[index % users.length];
-        const postTags = tags.sort(() => Math.random() - 0.5).slice(0, 3);
-        
-        feedPosts.push({
-            id: Date.now() + index,
-            author: user.name,
-            avatar: user.avatar,
-            text: post.text,
-            tags: postTags,
-            date: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
-            likes: post.likes,
-            views: post.views,
-            reposts: post.reposts,
-            comments: post.comments,
-            isPopular: index < 3
-        });
-    });
-}
-
-// Меню
 function toggleMenu() {
-    const panel = document.getElementById('menuPanel');
-    panel.classList.toggle('active');
+    document.getElementById('menuPanel').classList.toggle('active');
 }
 
 document.addEventListener('click', function(e) {
     const menu = document.getElementById('burgerMenu');
     const panel = document.getElementById('menuPanel');
-    
     if (menu && panel && !menu.contains(e.target) && panel.classList.contains('active')) {
         panel.classList.remove('active');
     }
 });
 
-// Переключение вкладок ленты
 function switchFeedTab(btn, tabName) {
-    const tabs = document.querySelectorAll('.feed-tab');
-    tabs.forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.feed-tab').forEach(t => t.classList.remove('active'));
     btn.classList.add('active');
-    
     currentFeedTab = tabName;
-    
-    // Показываем/скрываем фильтры
-    const filtersBar = document.getElementById('filtersBar');
-    if (filtersBar) {
-        filtersBar.style.display = tabName === 'recommendations' ? 'flex' : 'none';
-    }
-    
+    refreshPublicPosts();
     renderFeed();
 }
 
-// Установка фильтра
 function setFeedFilter(filter, btn) {
     currentFeedFilter = filter;
-    
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-    
     renderFeed();
 }
 
-// Сортировка постов
-function sortFeedPosts(postsArray) {
-    switch(currentFeedFilter) {
-        case 'date':
-            return postsArray.sort((a, b) => b.date - a.date);
-        case 'views':
-            return postsArray.sort((a, b) => b.views - a.views);
-        case 'reposts':
-            return postsArray.sort((a, b) => b.reposts - a.reposts);
-        case 'likes':
-            return postsArray.sort((a, b) => b.likes - a.likes);
-        case 'comments':
-            return postsArray.sort((a, b) => b.comments - a.comments);
-        default:
-            return postsArray;
+// Сохранение
+function savePublicPosts() {
+    localStorage.setItem('epta_public_posts', JSON.stringify(publicPosts));
+}
+
+// Извлечение хештегов
+function extractHashtags(text) {
+    const matches = text.match(/#[а-яА-ЯёЁa-zA-Z0-9_]+/g);
+    return matches ? [...new Set(matches)] : [];
+}
+
+// Рейтинг хештегов
+function calculateHashtagRank() {
+    const hashtagStats = {};
+    refreshPublicPosts();
+    
+    publicPosts.forEach(post => {
+        const tags = extractHashtags(post.text || '');
+        const score = (Likes.getLikeCount(post.id) || 0) + 
+                      (Comments.getCommentCount(post.id) || 0) + 
+                      (Reposts.getRepostCount(post.id) || 0) +
+                      (post.views || 0);
+        
+        tags.forEach(tag => {
+            if (!hashtagStats[tag]) hashtagStats[tag] = 0;
+            hashtagStats[tag] += score;
+        });
+    });
+    
+    return Object.entries(hashtagStats)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+}
+
+// Топ постов
+function calculateTopPosts() {
+    refreshPublicPosts();
+    return [...publicPosts]
+        .map(post => ({
+            ...post,
+            totalScore: (Likes.getLikeCount(post.id) || 0) + 
+                       (Comments.getCommentCount(post.id) || 0) + 
+                       (Reposts.getRepostCount(post.id) || 0)
+        }))
+        .sort((a, b) => b.totalScore - a.totalScore)
+        .slice(0, 5);
+}
+
+// Обновление сайдбара
+function updateSidebar() {
+    const hashtagsContainer = document.getElementById('topHashtags');
+    if (hashtagsContainer) {
+        const topHashtags = calculateHashtagRank();
+        hashtagsContainer.innerHTML = topHashtags.length === 0 
+            ? '<span style="color:#666;font-size:13px;">Пока нет хештегов</span>'
+            : topHashtags.map(([tag, score]) => 
+                `<a href="#" class="hashtag">${tag} (${score})</a>`
+            ).join('');
+    }
+    
+    const topPostsContainer = document.getElementById('topPosts');
+    if (topPostsContainer) {
+        const topPosts = calculateTopPosts();
+        topPostsContainer.innerHTML = topPosts.length === 0
+            ? '<div style="color:#666;font-size:13px;text-align:center;padding:20px;">Пока нет постов</div>'
+            : topPosts.map((post, i) => `
+                <div class="popular-post-item">
+                    <div class="popular-post-rank">#${i + 1}</div>
+                    <div class="popular-post-info">
+                        <div class="popular-post-text">${escapeHtml((post.text || '').substring(0, 50))}${post.text && post.text.length > 50 ? '...' : ''}</div>
+                        <div class="popular-post-stats">${post.totalScore} очков</div>
+                    </div>
+                </div>
+            `).join('');
     }
 }
 
-// Рендер ленты
+function sortFeedPosts(arr) {
+    switch(currentFeedFilter) {
+        case 'date': return arr.sort((a, b) => b.date - a.date);
+        case 'views': return arr.sort((a, b) => (b.views || 0) - (a.views || 0));
+        case 'reposts': return arr.sort((a, b) => Reposts.getRepostCount(b.id) - Reposts.getRepostCount(a.id));
+        case 'likes': return arr.sort((a, b) => Likes.getLikeCount(b.id) - Likes.getLikeCount(a.id));
+        case 'comments': return arr.sort((a, b) => Comments.getCommentCount(b.id) - Comments.getCommentCount(a.id));
+        default: return arr;
+    }
+}
+
+function createFileURL(file) {
+    return URL.createObjectURL(file);
+}
+
+function renderPostFiles(files) {
+    if (!files || !files.length) return '';
+    return `<div class="post-files">${files.map(file => {
+        const url = createFileURL(file);
+        if (file.type && file.type.startsWith('image/')) return `<img src="${url}" class="post-file-image" onclick="window.open('${url}')">`;
+        if (file.type && file.type.startsWith('video/')) return `<video src="${url}" class="post-file-video" controls></video>`;
+        return `<div class="post-file-other">${file.name} (${(file.size/1024/1024).toFixed(2)} MB)</div>`;
+    }).join('')}</div>`;
+}
+
+function formatDateTime(date) {
+    const now = new Date();
+    const d = new Date(date);
+    const days = Math.floor((now - d) / 86400000);
+    const time = d.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+    const dayMonth = d.toLocaleDateString('ru-RU', {day: 'numeric', month: 'long'});
+    
+    if (days === 0) return `сегодня в ${time}`;
+    if (days === 1) return `вчера в ${time}`;
+    return `${dayMonth} в ${time}`;
+}
+
 function renderFeed() {
     const container = document.getElementById('feedPosts');
     if (!container) return;
     
-    let postsToShow = [...feedPosts];
+    refreshPublicPosts();
+    let posts = sortFeedPosts([...publicPosts]);
     
-    // Фильтруем в зависимости от вкладки
-    if (currentFeedTab === 'popular') {
-        postsToShow = postsToShow.filter(post => post.isPopular);
+    if (!posts.length) {
+        container.innerHTML = '<p style="text-align:center;padding:60px;color:#888;font-size:18px;">Пока нет публичных постов</p>';
+        return;
     }
     
-    // Сортируем
-    postsToShow = sortFeedPosts(postsToShow);
-    
-    container.innerHTML = postsToShow.map(post => `
+    container.innerHTML = posts.map(post => `
         <div class="feed-post">
             <div class="feed-post-header">
-                <div class="feed-post-avatar">${post.avatar}</div>
+                <div class="feed-post-avatar">${post.avatar || ':)'}</div>
                 <div class="feed-post-info">
-                    <div class="feed-post-author">
-                        ${escapeHtml(post.author)}
-                        ${post.isPopular ? '<span style="color: #61DE2A; font-size: 12px;">⭐ Popular</span>' : ''}
-                    </div>
-                    <div class="feed-post-date">${formatDate(post.date)}</div>
+                    <div class="feed-post-author">${escapeHtml(post.author || '@username')}</div>
+                    <div class="feed-post-date">${formatDateTime(post.date)}</div>
                 </div>
             </div>
-            <div class="feed-post-tags">
-                ${post.tags.map(tag => `<a href="#" class="feed-post-tag">${tag}</a>`).join('')}
-            </div>
-            <div class="feed-post-text">${escapeHtml(post.text)}</div>
+            ${post.text ? `<div class="feed-post-text">${escapeHtml(post.text)}</div>` : ''}
+            ${post.files ? renderPostFiles(post.files) : ''}
             <div class="feed-post-stats">
-                <span>👁️ ${formatNumber(post.views)}</span>
-                <span>🔄 ${formatNumber(post.reposts)}</span>
-                <span>❤️ ${formatNumber(post.likes)}</span>
-                <span>💬 ${formatNumber(post.comments)}</span>
+                <span>${post.views || 0} просмотров</span>
+                <span>${Reposts.getRepostCount(post.id)} репостов</span>
+                <span>${Likes.getLikeCount(post.id)} лайков</span>
+                <span>${Comments.getCommentCount(post.id)} комментов</span>
             </div>
             <div class="feed-post-actions">
-                <button class="post-action-btn" onclick="likeFeedPost(this, ${post.id})">
-                    ❤️ <span>${Likes.getLikeCount(post.id) || post.likes}</span>
-                </button>
-                <button class="post-action-btn" onclick="commentFeedPost(${post.id})">
-                    💬 <span>${Comments.getCommentCount(post.id) || post.comments}</span>
-                </button>
-                <button class="post-action-btn" onclick="repostFeedPost(${post.id})">
-                    🔄 <span>${Reposts.getRepostCount(post.id) || post.reposts}</span>
-                </button>
+                <button class="post-action-btn" onclick="likeFeedPost(this, ${post.id})">Like (${Likes.getLikeCount(post.id)})</button>
+                <button class="post-action-btn" onclick="openFeedComments(${post.id})">Comment (${Comments.getCommentCount(post.id)})</button>
+                <button class="post-action-btn" onclick="openRepostModal(${post.id})">Repost (${Reposts.getRepostCount(post.id)})</button>
             </div>
         </div>
     `).join('');
 }
 
-// Функции взаимодействия с постами
 function likeFeedPost(btn, postId) {
-    const span = btn.querySelector('span');
-    let count = parseInt(span.textContent);
-    
     if (btn.classList.contains('liked')) {
-        count--;
         btn.classList.remove('liked');
-        btn.style.color = '#888888';
         Likes.removeLike(postId, 'currentUser');
     } else {
-        count++;
         btn.classList.add('liked');
-        btn.style.color = '#ff4444';
         Likes.addLike(postId, 'currentUser');
     }
+    renderFeed();
+    updateSidebar();
+}
+
+// Репост с выбором контакта
+function openRepostModal(postId) {
+    currentFeedPostId = postId;
+    const modal = document.getElementById('repostModal');
+    const contactsContainer = document.getElementById('repostContacts');
     
-    span.textContent = count;
+    contactsContainer.innerHTML = recentContacts.map(contact => `
+        <div class="repost-contact-item" onclick="sendRepost(${postId}, '${escapeHtml(contact.name)}')">
+            <div class="comment-avatar">${contact.avatar}</div>
+            <span>${escapeHtml(contact.name)}</span>
+        </div>
+    `).join('') + `
+        <div class="repost-contact-item" onclick="sendRepost(${postId}, 'all')">
+            <div class="comment-avatar">...</div>
+            <span>Всем друзьям</span>
+        </div>
+    `;
+    
+    modal.classList.add('active');
 }
 
-function commentFeedPost(postId) {
-    const comment = prompt('Введите комментарий:');
-    if (comment && comment.trim()) {
-        Comments.addComment(postId, comment.trim());
-        const post = feedPosts.find(p => p.id === postId);
-        if (post) {
-            post.comments = Comments.getCommentCount(postId);
-            renderFeed();
-        }
-    }
+function closeRepostModal() {
+    document.getElementById('repostModal').classList.remove('active');
+    currentFeedPostId = null;
 }
 
-function repostFeedPost(postId) {
-    const reposted = Reposts.addRepost(postId, 'currentUser');
-    const post = feedPosts.find(p => p.id === postId);
-    if (post && reposted) {
-        post.reposts = Reposts.getRepostCount(postId);
+function sendRepost(postId, target) {
+    Reposts.addRepost(postId, 'currentUser');
+    closeRepostModal();
+    renderFeed();
+    updateSidebar();
+}
+
+function openFeedComments(postId) {
+    currentFeedPostId = postId;
+    document.getElementById('feedCommentsModal').classList.add('active');
+    renderFeedComments(postId);
+}
+
+function closeFeedComments() {
+    document.getElementById('feedCommentsModal').classList.remove('active');
+    currentFeedPostId = null;
+}
+
+function addFeedComment() {
+    const input = document.getElementById('feedCommentInput');
+    const text = input.value.trim();
+    if (text && currentFeedPostId) {
+        Comments.addComment(currentFeedPostId, text, '@username');
+        input.value = '';
+        renderFeedComments(currentFeedPostId);
         renderFeed();
+        updateSidebar();
     }
 }
 
-// Форматирование даты
-function formatDate(date) {
-    const now = new Date();
-    const diff = now - date;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    
-    if (days === 0) {
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        if (hours === 0) {
-            const minutes = Math.floor(diff / (1000 * 60));
-            return `${minutes} мин. назад`;
-        }
-        return `${hours} ч. назад`;
-    } else if (days === 1) {
-        return 'Вчера';
-    } else if (days < 7) {
-        return `${days} дн. назад`;
-    } else {
-        return date.toLocaleDateString('ru-RU');
-    }
+function renderFeedComments(postId) {
+    const list = document.getElementById('feedCommentsList');
+    const comments = Comments.getComments(postId);
+    list.innerHTML = comments.length === 0 
+        ? '<p style="color:#666;text-align:center;padding:20px;">Нет комментариев</p>'
+        : comments.map(c => `<div class="comment-item"><div class="comment-header"><div class="comment-avatar">:)</div><span class="comment-author">${escapeHtml(c.author)}</span><span class="comment-date">${formatDateTime(new Date(c.date))}</span></div><div class="comment-text">${escapeHtml(c.text)}</div></div>`).join('');
 }
 
-// Форматирование чисел
-function formatNumber(num) {
-    if (num >= 1000) {
-        return (num / 1000).toFixed(1) + 'K';
-    }
-    return num.toString();
-}
-
-// Экранирование HTML
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
+
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('feedCommentsModal');
+    if (modal && e.target === modal) closeFeedComments();
+    const repostModal = document.getElementById('repostModal');
+    if (repostModal && e.target === repostModal) closeRepostModal();
+});
