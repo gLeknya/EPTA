@@ -15,11 +15,14 @@ let posts = [];
 // Файлы для загрузки
 let pendingFiles = [];
 
+// Текущий пост для комментариев
+let currentPostId = null;
+
 // Инициализация
 document.addEventListener('DOMContentLoaded', function() {
     changeStatus('online');
     createFallingNumbers();
-    addTestPosts();
+    renderPosts();
     
     // Закрытие дропдауна при клике вне
     document.addEventListener('click', function(e) {
@@ -30,31 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-// Тестовые посты
-function addTestPosts() {
-    posts.push({
-        id: 1,
-        text: 'Первый пост! Тестируем систему 🚀',
-        date: new Date('2024-01-15'),
-        views: 150,
-        likes: 25,
-        reposts: 5,
-        comments: 8
-    });
-    
-    posts.push({
-        id: 2,
-        text: 'Сегодня отличный день для кодинга! 💻',
-        date: new Date('2024-02-20'),
-        views: 300,
-        likes: 45,
-        reposts: 12,
-        comments: 15
-    });
-    
-    renderPosts();
-}
 
 // Создание падающих чисел 42
 function createFallingNumbers() {
@@ -91,7 +69,7 @@ document.addEventListener('click', function(e) {
     const menu = document.getElementById('burgerMenu');
     const panel = document.getElementById('menuPanel');
     
-    if (!menu.contains(e.target) && panel.classList.contains('active')) {
+    if (menu && panel && !menu.contains(e.target) && panel.classList.contains('active')) {
         panel.classList.remove('active');
     }
 });
@@ -201,10 +179,35 @@ function sortPosts(postsArray) {
         case 'likes':
             return postsArray.sort((a, b) => b.likes - a.likes);
         case 'comments':
-            return postsArray.sort((a, b) => b.comments - a.comments);
+            return postsArray.sort((a, b) => Comments.getCommentCount(b.id) - Comments.getCommentCount(a.id));
         default:
             return postsArray;
     }
+}
+
+// Создание URL для файла
+function createFileURL(file) {
+    return URL.createObjectURL(file);
+}
+
+// Рендер файлов в посте
+function renderPostFiles(files) {
+    if (!files || files.length === 0) return '';
+    
+    return `
+        <div class="post-files">
+            ${files.map(file => {
+                const url = createFileURL(file);
+                if (file.type.startsWith('image/')) {
+                    return `<img src="${url}" class="post-file-image" alt="${file.name}" onclick="window.open('${url}')">`;
+                } else if (file.type.startsWith('video/')) {
+                    return `<video src="${url}" class="post-file-video" controls></video>`;
+                } else {
+                    return `<div class="post-file-other">📄 ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</div>`;
+                }
+            }).join('')}
+        </div>
+    `;
 }
 
 // Рендер постов
@@ -220,25 +223,26 @@ function renderPosts() {
                 <div class="post-avatar-placeholder" style="width: 36px; height: 36px; font-size: 18px;">😊</div>
                 <div class="post-header-info">
                     <span class="post-author">${escapeHtml(userData.username)}</span>
-                    <span class="post-date">${post.date.toLocaleDateString('ru-RU')}</span>
+                    <span class="post-date">${formatDate(post.date)}</span>
                 </div>
             </div>
-            <div class="post-text">${escapeHtml(post.text)}</div>
+            ${post.text ? `<div class="post-text">${escapeHtml(post.text)}</div>` : ''}
+            ${post.files ? renderPostFiles(post.files) : ''}
             <div class="post-stats">
-                <span>👁️ ${post.views}</span>
-                <span>🔄 ${Reposts.getRepostCount(post.id) || post.reposts}</span>
-                <span>❤️ ${Likes.getLikeCount(post.id) || post.likes}</span>
-                <span>💬 ${Comments.getCommentCount(post.id) || post.comments}</span>
+                <span>👁️ ${post.views || 0}</span>
+                <span>🔄 ${Reposts.getRepostCount(post.id)}</span>
+                <span>❤️ ${Likes.getLikeCount(post.id)}</span>
+                <span>💬 ${Comments.getCommentCount(post.id)}</span>
             </div>
             <div class="post-actions">
                 <button class="post-action-btn" onclick="likePost(this, ${post.id})">
-                    ❤️ <span>${Likes.getLikeCount(post.id) || post.likes}</span>
+                    ❤️ <span>${Likes.getLikeCount(post.id)}</span>
                 </button>
-                <button class="post-action-btn" onclick="commentPost(${post.id})">
-                    💬 <span>${Comments.getCommentCount(post.id) || post.comments}</span>
+                <button class="post-action-btn" onclick="openComments(${post.id})">
+                    💬 <span>${Comments.getCommentCount(post.id)}</span>
                 </button>
                 <button class="post-action-btn" onclick="repostPost(${post.id})">
-                    🔄 <span>${Reposts.getRepostCount(post.id) || post.reposts}</span>
+                    🔄 <span>${Reposts.getRepostCount(post.id)}</span>
                 </button>
             </div>
         </div>
@@ -260,14 +264,12 @@ function switchTab(btn, tabName) {
         filtersBar.style.display = 'flex';
         wallContent.innerHTML = `
             <div class="post-editor">
-                <div class="post-avatar-placeholder">😊</div>
+                <div class="post-avatar-placeholder" id="editorAvatar">😊</div>
                 <div class="post-input-wrapper">
                     <textarea class="post-input" placeholder="Че нового, братан?" id="postInput"></textarea>
                     <div class="post-actions-bar">
-                        <input type="file" id="fileInput" style="display: none;" multiple accept="*/*" onchange="handleFiles(this.files)">
+                        <input type="file" id="fileInput" style="display: none;" multiple accept="image/*,video/*" onchange="handleFiles(this.files)">
                         <button class="post-action-icon glass-btn" title="Прикрепить файл" onclick="document.getElementById('fileInput').click()">📎</button>
-                        <button class="post-action-icon glass-btn" title="Фото">📷</button>
-                        <button class="post-action-icon glass-btn" title="Видео">🎬</button>
                         <div class="file-list" id="fileList"></div>
                         <button class="post-submit glass-btn" onclick="addPost()">✈️</button>
                     </div>
@@ -276,6 +278,7 @@ function switchTab(btn, tabName) {
             <div id="postsContainer"></div>
         `;
         renderPosts();
+        if (pendingFiles.length > 0) updateFileList();
     } else if (tabName === 'photos') {
         filtersBar.style.display = 'flex';
         wallContent.innerHTML = '<p style="text-align: center; padding: 60px; color: #888888; font-size: 18px;">📸 Тут будут фоточки!</p>';
@@ -292,7 +295,7 @@ function addPost() {
     
     const text = input.value.trim();
     
-    // Проверяем файлы еще раз
+    // Проверяем файлы
     const MAX_SIZE = 10 * 1024 * 1024;
     for (let file of pendingFiles) {
         if (file.size > MAX_SIZE) {
@@ -305,12 +308,9 @@ function addPost() {
     if (text || pendingFiles.length > 0) {
         const newPost = {
             id: Date.now(),
-            text: text || '📎 Файлы прикреплены',
+            text: text || '',
             date: new Date(),
             views: 0,
-            likes: 0,
-            reposts: 0,
-            comments: 0,
             files: [...pendingFiles]
         };
         
@@ -343,25 +343,53 @@ function likePost(btn, postId) {
     span.textContent = count;
 }
 
-// Комментирование поста
-function commentPost(postId) {
-    const comment = prompt('Введите комментарий:');
-    if (comment && comment.trim()) {
-        Comments.addComment(postId, comment.trim());
-        const post = posts.find(p => p.id === postId);
-        if (post) {
-            post.comments = Comments.getCommentCount(postId);
-            renderPosts();
-        }
+// Комментарии
+function openComments(postId) {
+    currentPostId = postId;
+    const modal = document.getElementById('commentsModal');
+    modal.classList.add('active');
+    renderComments(postId);
+}
+
+function closeCommentsModal() {
+    document.getElementById('commentsModal').classList.remove('active');
+    currentPostId = null;
+}
+
+function addCommentToPost() {
+    const input = document.getElementById('commentInput');
+    const text = input.value.trim();
+    
+    if (text && currentPostId) {
+        Comments.addComment(currentPostId, text, userData.username);
+        input.value = '';
+        renderComments(currentPostId);
+        renderPosts();
     }
+}
+
+function renderComments(postId) {
+    const commentsList = document.getElementById('commentsList');
+    const comments = Comments.getComments(postId);
+    
+    commentsList.innerHTML = comments.length === 0 
+        ? '<p style="color: #666; text-align: center; padding: 20px;">Пока нет комментариев</p>'
+        : comments.map(comment => `
+            <div class="comment-item">
+                <div class="comment-header">
+                    <div class="comment-avatar">😊</div>
+                    <span class="comment-author">${escapeHtml(comment.author)}</span>
+                    <span class="comment-date">${formatDate(new Date(comment.date))}</span>
+                </div>
+                <div class="comment-text">${escapeHtml(comment.text)}</div>
+            </div>
+        `).join('');
 }
 
 // Репост поста
 function repostPost(postId) {
     const reposted = Reposts.addRepost(postId, 'currentUser');
-    const post = posts.find(p => p.id === postId);
-    if (post && reposted) {
-        post.reposts = Reposts.getRepostCount(postId);
+    if (reposted) {
         renderPosts();
     }
 }
@@ -399,6 +427,28 @@ function toggleFriend() {
     }
 }
 
+// Форматирование даты
+function formatDate(date) {
+    const now = new Date();
+    const diff = now - date;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    
+    if (days === 0) {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        if (hours === 0) {
+            const minutes = Math.floor(diff / (1000 * 60));
+            return `${minutes} мин. назад`;
+        }
+        return `${hours} ч. назад`;
+    } else if (days === 1) {
+        return 'Вчера';
+    } else if (days < 7) {
+        return `${days} дн. назад`;
+    } else {
+        return date.toLocaleDateString('ru-RU');
+    }
+}
+
 // Экранирование HTML
 function escapeHtml(text) {
     const div = document.createElement('div');
@@ -406,11 +456,13 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Закрытие модального окна по клику
+// Закрытие модальных окон по клику
 document.getElementById('statusModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeStatusModal();
-    }
+    if (e.target === this) closeStatusModal();
+});
+
+document.getElementById('commentsModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCommentsModal();
 });
 
 // Отправка поста по Ctrl+Enter

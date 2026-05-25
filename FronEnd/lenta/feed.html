@@ -8,10 +8,8 @@
     <link rel="stylesheet" href="feed.css">
 </head>
 <body>
-    <!-- Анимация падающих 42 -->
     <div class="falling-numbers" id="fallingNumbers"></div>
 
-    <!-- Меню-бургер -->
     <div class="burger-menu" id="burgerMenu">
         <div class="burger-icon" onclick="toggleMenu()">
             <span></span>
@@ -28,7 +26,6 @@
         </div>
     </div>
 
-    <!-- Header -->
     <header class="header">
         <div class="header-inner">
             <a href="../you/index.html" class="logo">ЕПТА</a>
@@ -38,19 +35,15 @@
         </div>
     </header>
 
-    <!-- Лента -->
     <div class="feed-container">
         <div class="feed-grid">
-            <!-- Основной контент -->
             <div class="feed-main">
-                <!-- Табы -->
                 <div class="feed-tabs">
                     <button class="feed-tab active" onclick="switchFeedTab(this, 'recommendations')">🔥 Рекомендации</button>
                     <button class="feed-tab" onclick="switchFeedTab(this, 'popular')">⭐ Популярное</button>
                     <button class="feed-tab" onclick="switchFeedTab(this, 'fresh')">🆕 Свежее</button>
                 </div>
 
-                <!-- Фильтры -->
                 <div class="filters-bar" id="filtersBar">
                     <span class="filter-label">Сортировка:</span>
                     <button class="filter-btn active" onclick="setFeedFilter('date', this)">По дате</button>
@@ -60,15 +53,24 @@
                     <button class="filter-btn" onclick="setFeedFilter('comments', this)">По комментариям</button>
                 </div>
 
-                <!-- Контент ленты -->
                 <div class="feed-content" id="feedContent">
+                    <div class="post-editor">
+                        <div class="post-avatar-placeholder">😊</div>
+                        <div class="post-input-wrapper">
+                            <textarea class="post-input" placeholder="Поделись чем-то с миром..." id="feedPostInput"></textarea>
+                            <div class="post-actions-bar">
+                                <input type="file" id="feedFileInput" style="display: none;" multiple accept="image/*,video/*" onchange="handleFeedFiles(this.files)">
+                                <button class="post-action-icon glass-btn" title="Прикрепить файл" onclick="document.getElementById('feedFileInput').click()">📎</button>
+                                <div class="file-list" id="feedFileList"></div>
+                                <button class="post-submit glass-btn" onclick="addFeedPost()">✈️</button>
+                            </div>
+                        </div>
+                    </div>
                     <div id="feedPosts"></div>
                 </div>
             </div>
 
-            <!-- Сайдбар -->
             <aside class="feed-sidebar">
-                <!-- Популярные хештеги -->
                 <div class="sidebar-card">
                     <div class="sidebar-title">🔥 Популярные хештеги</div>
                     <div class="hashtags-cloud">
@@ -87,7 +89,6 @@
                     </div>
                 </div>
 
-                <!-- Популярные посты -->
                 <div class="sidebar-card">
                     <div class="sidebar-title">⭐ Популярные посты</div>
                     <div class="popular-posts">
@@ -118,6 +119,23 @@
             </aside>
         </div>
     </div>
+
+    <!-- Модалка комментариев -->
+    <div class="modal-overlay" id="feedCommentsModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-title">Комментарии</div>
+            <div class="comments-list" id="feedCommentsList"></div>
+            <div class="comment-input-wrapper">
+                <input type="text" class="modal-input" id="feedCommentInput" placeholder="Написать комментарий...">
+                <button class="btn btn-primary glass-btn" onclick="addFeedComment()">Отправить</button>
+            </div>
+            <div class="modal-actions" style="margin-top: 10px;">
+                <button class="btn btn-secondary glass-btn" onclick="closeFeedComments()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
 
     <script src="../you/comments.js"></script>
     <script src="../you/reposts.js"></script>
