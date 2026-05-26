@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ЕПТА - Лента</title>
+    <link rel="stylesheet" href="../you/style.css">
+    <link rel="stylesheet" href="feed.css">
+</head>
+<body>
+    <!-- Фоновое видео -->
+    <video autoplay loop muted playsinline class="background-video">
+        <source src="../oboi/video.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+
+    <div class="falling-numbers" id="fallingNumbers"></div>
+
+    <div class="burger-menu" id="burgerMenu">
+        <div class="burger-icon" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="menu-panel" id="menuPanel">
+            <div class="menu-content">
+                <a href="feed.html" class="menu-item active">
+                    <img src="../png/grid.png" class="menu-icon" alt=""> Лента
+                </a>
+                <a href="../you/index.html" class="menu-item">
+                    <img src="../png/portrait.png" class="menu-icon" alt=""> Профиль
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../png/sun.png" class="menu-icon" alt=""> Настройки
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../png/comment.png" class="menu-icon" alt=""> Чаты
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="../you/index.html" class="logo">ЕПТА</a>
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Поиск...">
+            </div>
+        </div>
+    </header>
+
+    <div class="feed-container">
+        <div class="feed-grid">
+            <div class="feed-main">
+                <div class="feed-tabs">
+                    <button class="feed-tab active" onclick="switchFeedTab(this, 'recommendations')">Рекомендации</button>
+                    <button class="feed-tab" onclick="switchFeedTab(this, 'popular')">Популярное</button>
+                    <button class="feed-tab" onclick="switchFeedTab(this, 'fresh')">Свежее</button>
+                </div>
+
+                <div class="filters-bar" id="filtersBar">
+                    <span class="filter-label">Сортировка:</span>
+                    <button class="filter-btn active" onclick="setFeedFilter('date', this)">По дате</button>
+                    <button class="filter-btn" onclick="setFeedFilter('views', this)">По просмотрам</button>
+                    <button class="filter-btn" onclick="setFeedFilter('reposts', this)">По репостам</button>
+                    <button class="filter-btn" onclick="setFeedFilter('likes', this)">По лайкам</button>
+                    <button class="filter-btn" onclick="setFeedFilter('comments', this)">По комментариям</button>
+                </div>
+
+                <div class="feed-content" id="feedContent">
+                    <div id="feedPosts"></div>
+                </div>
+            </div>
+
+            <aside class="feed-sidebar">
+                <div class="sidebar-card">
+                    <div class="sidebar-title">Топ хештеги</div>
+                    <div class="hashtags-cloud" id="topHashtags"></div>
+                </div>
+                <div class="sidebar-card">
+                    <div class="sidebar-title">Топ посты</div>
+                    <div class="popular-posts" id="topPosts"></div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="feedCommentsModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-title">
+                <img src="../png/comment.png" class="icon-20" alt=""> Комментарии
+            </div>
+            <div class="comments-list" id="feedCommentsList"></div>
+            <div class="comment-input-wrapper">
+                <input type="text" class="modal-input" id="feedCommentInput" placeholder="Написать комментарий...">
+                <button class="btn btn-primary glass-btn" onclick="addFeedComment()">
+                    <img src="../png/paper-plane.png" class="icon-16" alt=""> Отправить
+                </button>
+            </div>
+            <div class="modal-actions" style="margin-top:10px;">
+                <button class="btn btn-secondary glass-btn" onclick="closeFeedComments()">
+                    <img src="../png/cross.png" class="icon-16" alt=""> Закрыть
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="repostModal">
+        <div class="modal" style="max-width:400px;">
+            <div class="modal-title">
+                <img src="../png/users-alt.png" class="icon-20" alt=""> Поделиться с
+            </div>
+            <div class="repost-contacts" id="repostContacts"></div>
+            <div class="modal-actions" style="margin-top:10px;">
+                <button class="btn btn-secondary glass-btn" onclick="closeRepostModal()">
+                    <img src="../png/cross.png" class="icon-16" alt=""> Отмена
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../api.js"></script>
+    <script src="../you/comments.js"></script>
+    <script src="../you/reposts.js"></script>
+    <script src="../you/likes.js"></script>
+    <script src="feed.js"></script>
+</body>
+</html>

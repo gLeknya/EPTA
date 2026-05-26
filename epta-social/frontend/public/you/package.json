@@ -1,0 +1,14 @@
+{
+  "name": "epta-profile",
+  "version": "1.0.0",
+  "description": "Профиль в стиле ЕПТА с интеграцией backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node smoke-tests.js"
+  },
+  "keywords": ["profile", "epta", "social"],
+  "author": "",
+  "license": "ISC"
+}

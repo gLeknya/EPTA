@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ЕПТА - Профиль</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Фоновое видео -->
+    <video autoplay loop muted playsinline class="background-video">
+        <source src="../oboi/video.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+
+    <div class="falling-numbers" id="fallingNumbers"></div>
+
+    <div class="burger-menu" id="burgerMenu">
+        <div class="burger-icon" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="menu-panel" id="menuPanel">
+            <div class="menu-content">
+                <a href="../lenta/feed.html" class="menu-item">
+                    <img src="../png/grid.png" class="menu-icon" alt=""> Лента
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../png/portrait.png" class="menu-icon" alt=""> Профиль
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../png/sun.png" class="menu-icon" alt=""> Настройки
+                </a>
+                <a href="#" class="menu-item">
+                    <img src="../png/comment.png" class="menu-icon" alt=""> Чаты
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="../lenta/feed.html" class="logo">ЕПТА</a>
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Поиск...">
+            </div>
+        </div>
+    </header>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-main">
+                <div class="avatar-section">
+                    <div class="avatar-wrapper" id="avatarWrapper">
+                        <div class="avatar-placeholder">
+                            <img src="../png/portrait.png" class="avatar-img" alt="">
+                        </div>
+                        <div class="status-selector-wrapper">
+                            <div class="status-selector" id="statusSelector">
+                                <div class="status-dot" id="statusDot" onclick="toggleStatusDropdown(event)"></div>
+                                <div class="status-dropdown" id="statusDropdown">
+                                    <div class="status-option" onclick="changeStatus('online')">
+                                        <span class="status-circle online"></span>
+                                        <span>Онлайн</span>
+                                    </div>
+                                    <div class="status-option" onclick="changeStatus('inactive')">
+                                        <span class="status-circle inactive"></span>
+                                        <span>Неактивен</span>
+                                    </div>
+                                    <div class="status-option" onclick="changeStatus('dnd')">
+                                        <span class="status-circle dnd"></span>
+                                        <span>Не беспокоить</span>
+                                    </div>
+                                    <div class="status-option" onclick="changeStatus('offline')">
+                                        <span class="status-circle offline"></span>
+                                        <span>Не в сети</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-name">
+                        <span id="profileName">@username</span>
+                    </div>
+                    <div class="profile-status" id="profileStatus" onclick="editStatus()">
+                        Добавить статус
+                    </div>
+                    <div class="profile-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Город:</span>
+                            <span class="detail-value">---</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Возраст:</span>
+                            <span class="detail-value">---</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Пол:</span>
+                            <span class="detail-value">---</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Сквад:</span>
+                            <span class="detail-value">---</span>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="btn btn-primary glass-btn" id="addFriendBtn" onclick="toggleFriend()">
+                            <img src="../png/users-alt.png" class="icon-18" alt=""> Добавить в друзья
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="main-content">
+                <div class="profile-tabs">
+                    <button class="tab-btn active" onclick="switchTab(this, 'wall')">Стена</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'photos')">
+                        <img src="../png/camera.png" class="icon-16" alt=""> Фотки
+                    </button>
+                    <button class="tab-btn" onclick="switchTab(this, 'videos')">
+                        <img src="../png/play-alt.png" class="icon-16" alt=""> Видео
+                    </button>
+                </div>
+                
+                <div class="filters-bar" id="filtersBar">
+                    <span class="filter-label">Сортировка:</span>
+                    <button class="filter-btn active" onclick="setFilter('date', this)">По дате</button>
+                    <button class="filter-btn" onclick="setFilter('views', this)">По просмотрам</button>
+                    <button class="filter-btn" onclick="setFilter('reposts', this)">По репостам</button>
+                    <button class="filter-btn" onclick="setFilter('likes', this)">По лайкам</button>
+                    <button class="filter-btn" onclick="setFilter('comments', this)">По комментариям</button>
+                </div>
+
+                <div class="wall" id="wallContent">
+                    <div class="post-editor">
+                        <div class="post-avatar-placeholder">
+                            <img src="../png/portrait.png" class="avatar-img-small" alt="">
+                        </div>
+                        <div class="post-input-wrapper">
+                            <textarea class="post-input" placeholder="Что нового?" id="postInput"></textarea>
+                            <div class="post-actions-bar">
+                                <input type="file" id="fileInput" style="display:none" multiple onchange="handleFiles(this.files)">
+                                <button class="post-action-icon glass-btn" onclick="document.getElementById('fileInput').click()">
+                                    <img src="../png/camera.png" class="icon-20" alt="">
+                                </button>
+                                <div class="file-list" id="fileList"></div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="publicCheckbox">
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-label">Публичный</span>
+                                </label>
+                                <button class="post-submit glass-btn" onclick="addPost()">
+                                    <img src="../png/paper-plane.png" class="icon-18" alt="">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="postsContainer"></div>
+                </div>
+            </div>
+
+            <aside class="sidebar">
+                <div class="sidebar-card">
+                    <div class="sidebar-title">Инфа</div>
+                    <div class="info-row">
+                        <span class="info-label">Город</span>
+                        <span class="info-value">---</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Возраст</span>
+                        <span class="info-value">---</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Пол</span>
+                        <span class="info-value">---</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Сквад</span>
+                        <span class="info-value">---</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="statusModal">
+        <div class="modal">
+            <div class="modal-title">Изменить статус</div>
+            <input type="text" class="modal-input" id="statusInput" placeholder="Введи статус">
+            <div class="modal-actions">
+                <button class="btn btn-secondary glass-btn" onclick="closeStatusModal()">
+                    <img src="../png/cross.png" class="icon-16" alt=""> Отмена
+                </button>
+                <button class="btn btn-primary glass-btn" onclick="saveStatus()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="commentsModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-title">
+                <img src="../png/comment.png" class="icon-20" alt=""> Комментарии
+            </div>
+            <div class="comments-list" id="commentsList"></div>
+            <div class="comment-input-wrapper">
+                <input type="text" class="modal-input" id="commentInput" placeholder="Написать комментарий...">
+                <button class="btn btn-primary glass-btn" onclick="addCommentToPost()">
+                    <img src="../png/paper-plane.png" class="icon-16" alt=""> Отправить
+                </button>
+            </div>
+            <div class="modal-actions" style="margin-top: 10px;">
+                <button class="btn btn-secondary glass-btn" onclick="closeCommentsModal()">
+                    <img src="../png/cross.png" class="icon-16" alt=""> Закрыть
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../api.js"></script>
+    <script src="comments.js"></script>
+    <script src="reposts.js"></script>
+    <script src="likes.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
